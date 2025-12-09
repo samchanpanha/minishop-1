@@ -149,10 +149,10 @@ async function sendStatsMessage(chatId: number) {
     const totalRevenue = orders.reduce((sum, order) => sum + order.totalAmount, 0);
     const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
-    const message = `📊 *MiniShop Statistics*\n\n`;
-    message += `📦 Total Orders: ${totalOrders}\n`;
-    message += `💰 Total Revenue: $${totalRevenue.toFixed(2)}\n`;
-    message += `📈 Average Order Value: $${averageOrderValue.toFixed(2)}\n`;
+    const message = `📊 *MiniShop Statistics*\n\n` +
+      `📦 Total Orders: ${totalOrders}\n` +
+      `💰 Total Revenue: $${totalRevenue.toFixed(2)}\n` +
+      `📈 Average Order Value: $${averageOrderValue.toFixed(2)}\n`;
 
     return await sendTelegramMessage(chatId, message, 'Markdown');
   } catch (error) {
