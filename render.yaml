@@ -19,10 +19,6 @@ services:
         fromDatabase:
           name: minishop-postgres
           property: connectionString
-      - key: DIRECT_URL
-        fromDatabase:
-          name: minishop-postgres
-          property: connectionString
       # App settings
       - key: NODE_ENV
         value: production

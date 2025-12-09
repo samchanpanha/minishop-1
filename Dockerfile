@@ -18,7 +18,11 @@ COPY . .
 FROM base AS builder
 WORKDIR /app
 
-# Generate Prisma client first
+# Build argument for DATABASE_URL (needed for Prisma generate)
+ARG DATABASE_URL
+ENV DATABASE_URL=${DATABASE_URL}
+
+# Generate Prisma client
 RUN npx prisma generate
 
 # Build Next.js
@@ -33,7 +37,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Install openssl for Prisma PostgreSQL
+# Install openssl for Prisma PostgreSQL connection
 RUN apk add --no-cache openssl
 
 # Create a secure user
@@ -55,6 +59,8 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# DATABASE_URL will be provided by Render environment variables
-# Run Prisma migrations and start Next.js
-CMD sh -c "npx prisma migrate deploy && npm start"
+# DATABASE_URL will be provided by Render/Docker environment variables at runtime
+# Example: postgresql://user:password@host:5432/database
+
+# Run Prisma db push (creates tables if they don't exist) and start Next.js
+CMD sh -c "npx prisma db push --accept-data-loss && npm start"
