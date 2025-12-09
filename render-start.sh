@@ -6,15 +6,8 @@ echo "=========================================="
 echo "Starting Render deployment script..."
 echo "=========================================="
 
-# Ensure database directory exists
-echo "Creating database directory..."
-mkdir -p /app/data
-
 # Show current environment for debugging
-echo "DATABASE_URL: $DATABASE_URL"
-echo "Current directory: $(pwd)"
-echo "Contents of /app/data:"
-ls -la /app/data || echo "Directory empty or doesn't exist yet"
+echo "DATABASE_URL is configured: $(if [ -n "$DATABASE_URL" ]; then echo 'Yes'; else echo 'No'; fi)"
 
 # Generate Prisma client (in case it wasn't generated during build)
 echo "Generating Prisma client..."
@@ -31,10 +24,6 @@ else
     npx prisma db push --accept-data-loss
     echo "Database schema pushed successfully!"
 fi
-
-# Verify tables exist
-echo "Verifying database..."
-echo "SELECT name FROM sqlite_master WHERE type='table';" | npx prisma db execute --stdin || echo "Could not verify tables"
 
 # Start the application
 echo "=========================================="
