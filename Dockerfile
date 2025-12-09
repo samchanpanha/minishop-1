@@ -1,68 +1,64 @@
-# Base image
+##############################
+# 1. Base dependencies image #
+##############################
 FROM node:20-alpine AS base
-
-# Install dependencies only when needed
-FROM base AS deps
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
-COPY package.json package-lock.json* ./
-RUN npm install --production
+# Install OS deps required by Prisma
+RUN apk add --no-cache openssl
 
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+COPY package.json package-lock.json ./
+RUN npm install --production=false
+
 COPY . .
 
-# Set DATABASE_URL for Prisma generate (must match runtime path)
-ENV DATABASE_URL="file:/app/data/dev.db"
-
-# Generate Prisma client
-RUN npx prisma generate
-
-# Build the Next.js application
-RUN npm run build
-
-# Production image, copy all the files and run next
-FROM base AS runner
+##############################
+# 2. Build the Next.js app   #
+##############################
+FROM base AS builder
 WORKDIR /app
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+RUN npm run build
+RUN npx prisma generate
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
 
-# Create data directory for SQLite
+##############################
+# 3. Production runtime image #
+##############################
+FROM node:18-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Create a secure user
+RUN addgroup --system --gid 1001 nodejs \
+    && adduser --system --uid 1001 nextjs
+
+# Create SQLite directory
 RUN mkdir -p /app/data && chown nextjs:nodejs /app/data
 
-# Copy built application
+# Copy compiled files from builder
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
-
-RUN mkdir -p /app/data
-
-# Copy Prisma schema and migrations
 COPY --from=builder /app/prisma ./prisma
 
-# Set DATABASE_URL for runtime
+# Runtime DB path for SQLite on Render
 ENV DATABASE_URL="file:/app/data/dev.db"
 
-RUN npx prisma db push --accept-data-loss
-
-# Generate Prisma client with correct path
-RUN npx prisma generate
-
-# Set permissions
+# Permissions
 RUN chown -R nextjs:nodejs /app
 USER nextjs
 
 EXPOSE 3000
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
-
-CMD ["npm", "start", "npx prisma migrate deploy"]
+##############################################
+# Render Start Command (runs at container run)
+#   1. Run Prisma migrations
+#   2. Start Next.js production server
+##############################################
+CMD sh -c "npx prisma migrate deploy && npm start"
