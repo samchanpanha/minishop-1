@@ -38,4 +38,4 @@ services:
         sync: false
       # Base URL (update after deployment)
       - key: NEXT_PUBLIC_BASE_URL
-        value: https://minishop-ecommerce.onrender.com
+        value: https://minishop-ecommerce-0plf.onrender.com
