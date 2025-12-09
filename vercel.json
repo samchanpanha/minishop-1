@@ -1,11 +1,3 @@
 {
-    "buildCommand": "next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/ && node prebuild.js && prisma generate && prisma db push",
-    "build": {
-        "env": {
-            "DATABASE_URL": "file:./prisma/dev.db"
-        }
-    },
-    "env": {
-        "DATABASE_URL": "file:./prisma/dev.db"
-    }
+    "buildCommand": "prisma generate && prisma db push && next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/"
 }
