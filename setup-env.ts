@@ -10,7 +10,7 @@ const rl = readline.createInterface({
 const envPath = path.join(process.cwd(), '.env');
 
 const questions = [
-    { key: 'DATABASE_URL', question: 'Enter DATABASE_URL (default: "file:./dev.db"): ', default: 'file:./dev.db' },
+    { key: 'DATABASE_URL', question: 'Enter DATABASE_URL (PostgreSQL connection string): ', default: 'postgresql://user:password@localhost:5432/minishop' },
     { key: 'STRIPE_SECRET_KEY', question: 'Enter STRIPE_SECRET_KEY: ' },
     { key: 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY', question: 'Enter NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ' },
     { key: 'TELEGRAM_BOT_TOKEN', question: 'Enter TELEGRAM_BOT_TOKEN: ' },
