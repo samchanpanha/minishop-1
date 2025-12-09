@@ -43,11 +43,15 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
+RUN mkdir -p /app/data
+
 # Copy Prisma schema and migrations
 COPY --from=builder /app/prisma ./prisma
 
 # Set DATABASE_URL for runtime
 ENV DATABASE_URL="file:/app/data/dev.db"
+
+RUN npx prisma db push --accept-data-loss
 
 # Generate Prisma client with correct path
 RUN npx prisma generate
