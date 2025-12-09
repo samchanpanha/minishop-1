@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: minishop-ecommerce
+    env: node
+    plan: starter # Starter plan or higher is usually recommended for Disks, but required for persistence
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: ./render-start.sh
+    disk:
+      name: sqlite-data
+      mountPath: /app/data
+      sizeGB: 1
+    envVars:
+      - key: DATABASE_URL
+        value: file:/app/data/dev.db
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_TELEMETRY_DISABLED
+        value: 1
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: NEXT_PUBLIC_BASE_URL
+        value: https://minishop-ecommerce.onrender.com

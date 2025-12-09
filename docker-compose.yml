@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  minishop-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: minishop-ecommerce
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/app/data/dev.db
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-sk_test_mock_key}
+      - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:-pk_test_mock_key}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-whsec_mock_secret}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - NEXT_PUBLIC_BASE_URL=http://localhost:3000
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    command: >
+      sh -c "
+        echo 'Waiting for database initialization...' &&
+        npx prisma migrate deploy &&
+        npm start
+      "
+
+networks:
+  default:
+    driver: bridge
