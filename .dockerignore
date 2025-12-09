@@ -5,7 +5,7 @@ npm-debug.log
 README.md
 .next
 .git
-package-lock.json
+# Keep package-lock.json - it's needed for npm install
 yarn.lock
 pnpm-lock.yaml
 test
