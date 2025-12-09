@@ -1,5 +1,10 @@
 {
+    "build": {
+        "env": {
+            "DATABASE_URL": "file:./prisma/dev.db"
+        }
+    },
     "env": {
-        "DATABASE_URL": "file:../.vercel/output/data/dev.db"
+        "DATABASE_URL": "file:./prisma/dev.db"
     }
 }
